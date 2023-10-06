@@ -1,6 +1,7 @@
 import requests
 import csv
 import json
+import re
 from bs4 import BeautifulSoup 
 
 #página com o índice de estrelas
@@ -99,12 +100,13 @@ for entry in entries:
 
               header = infobox_entry.select("th:first-child, td:first-child")
               if(header):
-                header_text = header[0].text.strip()
+                header_text = re.sub('\s+', ' ', header[0].get_text().strip())
                 # se o header está na lista de campos
                 if(header_text in fields_list):
                   data = infobox_entry.select("td:nth-child(2)")
                   if(data):
-                    data_text = data[0].get_text().strip()
+                    data_text = re.sub('\s+', ' ', data[0].get_text().strip())
+                    data_text=re.sub("\[.*?\]","",data_text)
                     print(header_text+": "+data_text+"\n")
                     # diciona o dado em star_data
                     star_data[header_text] = data_text
