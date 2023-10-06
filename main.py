@@ -18,12 +18,30 @@ i = 0
 entries = entries[1:]
 
 #inicializa lista de estrelas, e lista de campos
+#	cada entrada da lista stars_list é um dicionário, correspondente as informações de uma estrela. 
+#	cada entrada de um dicionário corresponde à um campo da infobox.
+#	fields_list é um lista que contém o conjunto de chaves distintas em todos os dicionários.
 stars_list = list()
 fields_list = list()
 
-#adiciona inicialmente os campos de nome e designação
+#adiciona inicialmente os campos de nome, designação e endereço
 fields_list.append("Modern name")
 fields_list.append("Designation")
+fields_list.append("Address")
+
+#adiciona o restante dos campos
+fields_list.append("Constellation")
+fields_list.append("Right ascension")
+fields_list.append("Declination")
+fields_list.append("Apparent magnitude (V)")
+fields_list.append("Spectral type")
+fields_list.append("Proper motion (μ)")
+fields_list.append("Parallax (π)")
+fields_list.append("Distance")
+fields_list.append("Absolute magnitude (MV)")
+fields_list.append("Mass")
+fields_list.append("Radius")
+fields_list.append("Temperature")
 
 #itera pelas entradas
 for entry in entries:
@@ -38,6 +56,7 @@ for entry in entries:
 
     print("Modern name: "+modern_name.get_text())
     print("Designation: "+designation.get_text())
+    # star_data é o dicionário correspondente à estrela atual, e depois da coleta dos dados será inserido em stars_list
     star_data = dict()
     star_data["Modern name"] = modern_name.get_text()
     star_data["Designation"] = designation.get_text()
@@ -45,55 +64,57 @@ for entry in entries:
 
     address = None
     
-    # tenta encontrar a página da estrela na coluna de nome, 
+    # tenta encontrar a página da estrela na coluna de "Modern name", 
     a = modern_name.find('a')
     if(a is not None and (not (a.has_attr('class') and "new" in a.attrs.get('class')))):
 
       address = a.attrs.get('href')
     else:
+      # tenta encontrar a página da estrela na coluna de "Designation", 
       a = designation.find('a')
       if(a is not None and (not (a.has_attr('class') and "new" in a.attrs.get('class')))):
         address = a.attrs.get('href')
       else:
-         print("Não tem")
+         # não há página para essa estrela", 
+         print("No data")
          
 
-    #se há uma pagina para a estrela e há uma infobox na página
-    # extrai as informações da info box
+    # se foi encontrado o endereço
     if(address is not None):
       print("Address: "+ address)
       address = "https://en.wikipedia.org" + address
       star_page = BeautifulSoup(requests.get(address).content, 'html.parser')
-      # procura por informações nas infoboxes
+      star_data["Address"] = address
+      # carrega a página e procura por infoboxes
       infobox_list = star_page.select(".infobox")
       for infobox in infobox_list:
+        # pra cada infobox carregada
         try:
           if(infobox is not None):
           
-            # procura pelas linhas da infobox 
-            # filtrar por cabeçalhos específicos, que identificam uma informação de interesse
+            # procura pelas linhas da infobox, tentando extrair qualquer informações de
+            # entradas que estão na forma <th>header</th><td>data</td> ou <td>header</td><td>data</td>
             infobox_entries = infobox.select("tr")
             for infobox_entry in infobox_entries:
 
               header = infobox_entry.select("th:first-child, td:first-child")
               if(header):
-                data = infobox_entry.select("td:nth-child(2)")
-                if(data):
-                  header_text = header[0].text.strip()
-                  data_text = data[0].get_text().strip()
-                  print(header_text+": "+data_text+"\n")
-                  star_data[header_text] = data_text
-                  if(not (header_text in fields_list)):
-                    fields_list.append(header_text)
-
-                  #print(header[0].text)
-
+                header_text = header[0].text.strip()
+                # se o header está na lista de campos
+                if(header_text in fields_list):
+                  data = infobox_entry.select("td:nth-child(2)")
+                  if(data):
+                    data_text = data[0].get_text().strip()
+                    print(header_text+": "+data_text+"\n")
+                    # diciona o dado em star_data
+                    star_data[header_text] = data_text
 
         except:
           pass
-      
+      # salva as informações coletadas em stars_list
       stars_list.append(star_data)
 
+#escreve toda stars_list no arquivo csv
 with open('Stars.csv', 'w') as csvfile:
     writer = csv.DictWriter(csvfile, fieldnames = fields_list)
     writer.writeheader()
