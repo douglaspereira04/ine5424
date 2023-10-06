@@ -1,2 +1,2 @@
-# ine5424
-INE5424 - Web scraping project
+# Web Scraping
+Web scraper of stars data from wikipedia. Developed for INE5424 course.
