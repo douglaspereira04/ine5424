@@ -31,18 +31,18 @@ fields_list.append("Designation")
 fields_list.append("Address")
 
 #adiciona o restante dos campos
-fields_list.append("Constellation")
-fields_list.append("Right ascension")
-fields_list.append("Declination")
-fields_list.append("Apparent magnitude (V)")
-fields_list.append("Spectral type")
-fields_list.append("Proper motion (μ)")
-fields_list.append("Parallax (π)")
-fields_list.append("Distance")
-fields_list.append("Absolute magnitude (MV)")
-fields_list.append("Mass")
-fields_list.append("Radius")
-fields_list.append("Temperature")
+#fields_list.append("Constellation")
+#fields_list.append("Right ascension")
+#fields_list.append("Declination")
+#fields_list.append("Apparent magnitude (V)")
+#fields_list.append("Spectral type")
+#fields_list.append("Proper motion (μ)")
+#fields_list.append("Parallax (π)")
+#fields_list.append("Distance")
+#fields_list.append("Absolute magnitude (MV)")
+#fields_list.append("Mass")
+#fields_list.append("Radius")
+#fields_list.append("Temperature")
 
 #itera pelas entradas
 for entry in entries:
@@ -100,16 +100,19 @@ for entry in entries:
 
               header = infobox_entry.select("th:first-child, td:first-child")
               if(header):
-                header_text = re.sub('\s+', ' ', header[0].get_text().strip())
-                # se o header está na lista de campos
-                if(header_text in fields_list):
+                header_text = re.sub('\s+', ' ', header[0].get_text().strip()).strip()
+                if(header_text):
                   data = infobox_entry.select("td:nth-child(2)")
                   if(data):
                     data_text = re.sub('\s+', ' ', data[0].get_text().strip())
-                    data_text=re.sub("\[.*?\]","",data_text)
+                    data_text = re.sub("\[.*?\]","",data_text).strip()
                     print(header_text+": "+data_text+"\n")
-                    # diciona o dado em star_data
-                    star_data[header_text] = data_text
+                    # diciona o dado em star_data, se nao for vazio
+                    if(data_text):
+                      # se o header nao está na lista de campos, adiciona-o
+                      if(header_text not in fields_list):
+                        fields_list.append(header_text)
+                      star_data[header_text] = data_text
 
         except:
           pass
