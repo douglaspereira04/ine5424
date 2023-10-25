@@ -31,18 +31,33 @@ fields_list.append("Designation")
 fields_list.append("Address")
 
 #adiciona o restante dos campos
-#fields_list.append("Constellation")
-#fields_list.append("Right ascension")
-#fields_list.append("Declination")
-#fields_list.append("Apparent magnitude (V)")
-#fields_list.append("Spectral type")
-#fields_list.append("Proper motion (μ)")
-#fields_list.append("Parallax (π)")
-#fields_list.append("Distance")
-#fields_list.append("Absolute magnitude (MV)")
-#fields_list.append("Mass")
-#fields_list.append("Radius")
-#fields_list.append("Temperature")
+fields_list.append("Constellation")
+fields_list.append("Right ascension")
+fields_list.append("Declination")
+fields_list.append("Spectral type")
+fields_list.append("Proper motion (μ)")
+fields_list.append("Parallax (π)")
+fields_list.append("Distance")
+fields_list.append("Absolute magnitude (MV)")
+fields_list.append("Mass")
+fields_list.append("Radius")
+fields_list.append("Luminosity")
+fields_list.append("Surface gravity (log g)")
+fields_list.append("Temperature")
+fields_list.append("Metallicity [Fe/H]")
+fields_list.append("Age")
+fields_list.append("U−B color index")
+fields_list.append("B−V color index")
+fields_list.append("Radial velocity (Rv)")
+fields_list.append("Rotational velocity (v sin i)")
+fields_list.append("Period (P)")
+fields_list.append("Pronunciation")
+fields_list.append("Semi-major axis (a)")
+fields_list.append("Eccentricity (e)")
+fields_list.append("Inclination (i)")
+fields_list.append("Longitude of the node (Ω)")
+fields_list.append("Periastron epoch (T)")
+fields_list.append("Argument of periastron (ω)(secondary)")
 
 #itera pelas entradas
 for entry in entries:
@@ -102,17 +117,16 @@ for entry in entries:
               if(header):
                 header_text = re.sub('\s+', ' ', header[0].get_text().strip()).strip()
                 if(header_text):
-                  data = infobox_entry.select("td:nth-child(2)")
-                  if(data):
-                    data_text = re.sub('\s+', ' ', data[0].get_text().strip())
-                    data_text = re.sub("\[.*?\]","",data_text).strip()
-                    print(header_text+": "+data_text+"\n")
-                    # diciona o dado em star_data, se nao for vazio
-                    if(data_text):
-                      # se o header nao está na lista de campos, adiciona-o
-                      if(header_text not in fields_list):
-                        fields_list.append(header_text)
-                      star_data[header_text] = data_text
+                  #se o cabeçalho indicar um dado de interesse
+                  if(header_text in fields_list):
+                    data = infobox_entry.select("td:nth-child(2)")
+                    if(data):
+                      data_text = re.sub('\s+', ' ', data[0].get_text().strip())
+                      data_text = re.sub("\[.*?\]","",data_text).strip()
+                      print(header_text+": "+data_text+"\n")
+                      # diciona o dado em star_data, se nao for vazio
+                      if(data_text):
+                        star_data[header_text] = data_text
 
         except:
           pass
